@@ -1,3 +1,3 @@
 # ZwierzLauncher
 Zwierzyniec Launcher
-prodget started
+the product was launched
