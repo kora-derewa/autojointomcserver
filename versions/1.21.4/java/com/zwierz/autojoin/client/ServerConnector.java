@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.network.CookieStorage;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import org.slf4j.Logger;
@@ -15,16 +16,10 @@ public class ServerConnector {
 
     public static void connectToServer(MinecraftClient client, String address, int port) {
         try {
-            LOGGER.info("Łączenie z serwerem: {}:{}", address, port);
-
             ServerAddress serverAddress = ServerAddress.parse(address + ":" + port);
             ServerInfo serverInfo = new ServerInfo(address, address + ":" + port, ServerInfo.ServerType.OTHER);
-
             Screen parent = client.currentScreen != null ? client.currentScreen : new TitleScreen();
-
-            ConnectScreen.connect(parent, client, serverAddress, serverInfo, false);
-
-            LOGGER.info("Wysłano żądanie połączenia do serwera");
+            ConnectScreen.connect(parent, client, serverAddress, serverInfo, false, new CookieStorage(new java.util.HashMap<>()));
         } catch (Exception e) {
             LOGGER.error("Błąd przy łączeniu z serwerem", e);
         }

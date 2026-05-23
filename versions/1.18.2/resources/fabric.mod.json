@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "autojoin",
+  "version": "${version}",
+  "name": "AutoJoin Server",
+  "description": "Automatyczne dołączanie na serwer Minecraft",
+  "authors": ["ZwierzLauncher"],
+  "contact": {"repo": "https://github.com/kora-derewa/ZwierzLauncher"},
+  "license": "MIT",
+  "icon": "assets/autojoin/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.zwierz.autojoin.AutoJoinMod"],
+    "client": ["com.zwierz.autojoin.client.AutoJoinClient"]
+  },
+  "mixins": ["autojoin.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.14.0",
+    "fabric-api": "*",
+    "minecraft": ">=1.18- <=1.18.2"
+  }
+}
