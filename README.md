@@ -157,8 +157,8 @@ Plik konfiguracji tworzy się automatycznie przy pierwszym uruchomieniu:
   "delayMs": 1000,
   "autoJoinOnLaunch": true,
   "showMessages": true,
-  "muteMusic": false,
-  "startupMusic": "minecraft:music_disc.13"
+  "muteMusic": true,
+  "startupMusic": ""
 }
 ```
 
@@ -170,8 +170,8 @@ Plik konfiguracji tworzy się automatycznie przy pierwszym uruchomieniu:
 | `delayMs` | long | `1000` | Opóźnienie przed dołączeniem (ms) |
 | `autoJoinOnLaunch` | boolean | `true` | Auto-dołączenie przy starcie |
 | `showMessages` | boolean | `true` | Komunikaty w chacie |
-| `muteMusic` | boolean | `false` | Wycisza całą muzykę w tle |
-| `startupMusic` | string | `minecraft:music_disc.13` | Sound event odtwarzany na ekranie tytułu (np. `minecraft:music_disc.13`, `minecraft:entity.experience_orb.pickup`) |
+| `muteMusic` | boolean | `true` | Wycisza całą muzykę w tle |
+| `startupMusic` | string | `""` | Sound event odtwarzany na ekranie tytułu (np. `minecraft:music_disc.13`, `minecraft:entity.experience_orb.pickup`). Puste = brak muzyki startowej |
 
 ### Przykłady
 

@@ -5,6 +5,6 @@
   "delayMs": 1000,
   "autoJoinOnLaunch": true,
   "showMessages": true,
-  "muteMusic": false,
-  "startupMusic": "minecraft:music_disc.13"
+  "muteMusic": true,
+  "startupMusic": ""
 }

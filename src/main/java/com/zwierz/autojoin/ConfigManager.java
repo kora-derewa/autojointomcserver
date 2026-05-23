@@ -63,8 +63,8 @@ public class ConfigManager {
         config.delayMs = 1000;
         config.autoJoinOnLaunch = true;
         config.showMessages = true;
-        config.muteMusic = false;
-        config.startupMusic = "minecraft:music_disc.13";
+        config.muteMusic = true;
+        config.startupMusic = "";
 
         try {
             Files.createDirectories(CONFIG_DIR);
@@ -112,8 +112,8 @@ public class ConfigManager {
         public long delayMs = 1000;
         public boolean autoJoinOnLaunch = true;
         public boolean showMessages = true;
-        public boolean muteMusic = false;
-        public String startupMusic = "minecraft:music_disc.13";
+        public boolean muteMusic = true;
+        public String startupMusic = "";
 
         public String getServerAddress() {
             return serverAddress + ":" + serverPort;
