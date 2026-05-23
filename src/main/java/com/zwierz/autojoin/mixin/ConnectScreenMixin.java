@@ -14,37 +14,40 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ConnectScreen.class)
 public class ConnectScreenMixin {
     @Unique
-    private static ButtonWidget autoJoinButton;
-    @Unique
-    private static boolean buttonAdded = false;
+    private ButtonWidget autoJoinButton;
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        buttonAdded = false;
+        autoJoinButton = null;
     }
 
     @Inject(method = "render", at = @At("HEAD"))
     private void onRender(CallbackInfo ci) {
-        if (buttonAdded || !ConfigManager.getConfig().showCancelButton) return;
+        if (!ConfigManager.getConfig().showCancelButton) return;
 
         ConnectScreen self = (ConnectScreen) (Object) this;
 
-        autoJoinButton = ButtonWidget.builder(
-            Text.literal("§cAnuluj"),
-            b -> {
-                net.minecraft.network.ClientConnection conn = ((ConnectScreenAccessor) self).getConnection();
-                if (conn != null) {
-                    ((ConnectScreenAccessor) self).setConnectingCancelled(true);
-                    conn.disconnect(Text.literal("Anulowano"));
+        if (autoJoinButton == null || !self.children().contains(autoJoinButton)) {
+            autoJoinButton = ButtonWidget.builder(
+                Text.literal("§cAnuluj"),
+                b -> {
+                    net.minecraft.network.ClientConnection conn = ((ConnectScreenAccessor) self).getConnection();
+                    if (conn != null) {
+                        ((ConnectScreenAccessor) self).setConnectingCancelled(true);
+                        conn.disconnect(Text.literal("Anulowano"));
+                    }
+                    AutoJoinMod.cancelled = true;
+                    self.close();
                 }
-                AutoJoinMod.cancelled = true;
-                self.close();
-            }
-        )
-        .dimensions(self.width / 2 - 60, self.height / 2 + 40, 120, 20)
-        .build();
+            )
+            .dimensions(self.width / 2 - 60, self.height / 2 + 40, 120, 20)
+            .build();
+            ((ScreenAccessor) self).invokeAddDrawableChild(autoJoinButton);
+        }
 
-        ((ScreenAccessor) self).invokeAddDrawableChild(autoJoinButton);
-        buttonAdded = true;
+        boolean done = ((ConnectScreenAccessor) self).getConnection() == null;
+        autoJoinButton.setMessage(done
+            ? Text.literal("§eSpróbuj ponownie")
+            : Text.literal("§cAnuluj"));
     }
 }
