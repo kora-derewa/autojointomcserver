@@ -35,8 +35,12 @@ public class ConnectScreenMixin {
                     if (conn != null) {
                         ((ConnectScreenAccessor) self).setConnectingCancelled(true);
                         conn.disconnect(Text.literal("Anulowano"));
+                        AutoJoinMod.cancelled = true;
+                    } else {
+                        AutoJoinMod.hasJoined = false;
+                        AutoJoinMod.cancelled = false;
+                        AutoJoinMod.joinAttemptTime = 0;
                     }
-                    AutoJoinMod.cancelled = true;
                     self.close();
                 }
             )
