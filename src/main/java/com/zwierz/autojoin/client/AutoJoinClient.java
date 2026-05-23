@@ -2,6 +2,7 @@ package com.zwierz.autojoin.client;
 
 import com.zwierz.autojoin.AutoJoinMod;
 import com.zwierz.autojoin.ConfigManager;
+import com.zwierz.autojoin.mixin.ScreenAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -52,6 +54,19 @@ public class AutoJoinClient implements ClientModInitializer {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (screen instanceof TitleScreen) {
                 startupMusicPlayed = false;
+                if (AutoJoinMod.hasJoined && !AutoJoinMod.cancelled && ConfigManager.getConfig().showCancelButton) {
+                    ButtonWidget retryBtn = ButtonWidget.builder(
+                        Text.literal("§e✖ Spróbuj ponownie"),
+                        b -> {
+                            AutoJoinMod.hasJoined = false;
+                            AutoJoinMod.cancelled = false;
+                            AutoJoinMod.joinAttemptTime = 0;
+                        }
+                    )
+                    .dimensions(screen.width / 2 - 100, screen.height / 4 + 144, 200, 20)
+                    .build();
+                    ((ScreenAccessor) screen).invokeAddDrawableChild(retryBtn);
+                }
             }
         });
     }

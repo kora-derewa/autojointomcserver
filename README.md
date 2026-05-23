@@ -46,6 +46,7 @@ Po uruchomieniu Minecrafta edytuj `~/.minecraft/config/autojoin/autojoin.json` i
 - Regulowane opóźnienie przed dołączeniem
 - Komunikaty w chacie
 - Włącz/wyłącz bez restartu gry
+- Przycisk "Spróbuj ponownie" na ekranie tytułu po błędzie połączenia
 - Open source (MIT)
 
 ---
