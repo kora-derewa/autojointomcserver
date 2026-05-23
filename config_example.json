@@ -4,5 +4,7 @@
   "serverPort": 25565,
   "delayMs": 1000,
   "autoJoinOnLaunch": true,
-  "showMessages": true
+  "showMessages": true,
+  "muteMusic": false,
+  "startupMusic": "minecraft:music_disc.13"
 }

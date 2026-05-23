@@ -9,7 +9,11 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,20 +22,22 @@ public class AutoJoinClient implements ClientModInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoJoinMod.MOD_ID);
     private static boolean hasJoined = false;
     private static long joinAttemptTime = 0;
+    private static boolean musicMuted = false;
+    private static boolean startupMusicPlayed = false;
 
     @Override
     public void onInitializeClient() {
         LOGGER.info("AutoJoin Client initializing");
 
-        // Event wykonywany co tick po stronie klienta
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.currentScreen instanceof TitleScreen && !hasJoined) {
-                ConfigManager.Config config = ConfigManager.getConfig();
+            ConfigManager.Config config = ConfigManager.getConfig();
 
+            applyMusicSettings(client, config);
+
+            if (client.currentScreen instanceof TitleScreen && !hasJoined) {
                 if (config.enabled && config.autoJoinOnLaunch) {
                     long currentTime = System.currentTimeMillis();
 
-                    // Czekaj określone opóźnienie przed dołączeniem
                     if (joinAttemptTime == 0) {
                         joinAttemptTime = currentTime;
                     }
@@ -44,13 +50,47 @@ public class AutoJoinClient implements ClientModInitializer {
             }
         });
 
-        // Reset flagi przy powrocie na ekran tytułu
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (!(screen instanceof TitleScreen)) {
                 hasJoined = false;
                 joinAttemptTime = 0;
+                startupMusicPlayed = false;
             }
         });
+    }
+
+    private static void applyMusicSettings(MinecraftClient client, ConfigManager.Config config) {
+        if (config.muteMusic && !musicMuted) {
+            client.options.getSoundVolumeOption(SoundCategory.MUSIC).setValue(0.0);
+            musicMuted = true;
+            LOGGER.info("Muzyka wyciszona");
+        }
+
+        if (!config.muteMusic && musicMuted) {
+            client.options.getSoundVolumeOption(SoundCategory.MUSIC).setValue(1.0);
+            musicMuted = false;
+            LOGGER.info("Muzyka przywrócona");
+        }
+
+        if (client.currentScreen instanceof TitleScreen
+                && config.enabled
+                && config.startupMusic != null
+                && !config.startupMusic.isEmpty()
+                && !startupMusicPlayed) {
+            try {
+                Identifier soundId = Identifier.tryParse(config.startupMusic);
+                if (soundId != null) {
+                    client.getSoundManager().play(
+                        PositionedSoundInstance.music(SoundEvent.of(soundId))
+                    );
+                    LOGGER.info("Odtwarzanie muzyki startowej: {}", config.startupMusic);
+                }
+                startupMusicPlayed = true;
+            } catch (Exception e) {
+                LOGGER.error("Błąd odtwarzania muzyki startowej: {}", config.startupMusic, e);
+                startupMusicPlayed = true;
+            }
+        }
     }
 
     private static void joinServer(MinecraftClient client, ConfigManager.Config config) {
