@@ -6,7 +6,8 @@
   "mixins": [
     "TitleScreenMixin",
     "ScreenAccessor",
-    "ConnectScreenAccessor"
+    "ConnectScreenAccessor",
+    "ConnectScreenMixin"
   ],
   "client": [],
   "injectors": {
