@@ -6,20 +6,30 @@ import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ConnectScreen.class)
 public class ConnectScreenMixin {
+    @Unique
+    private static ButtonWidget autoJoinButton;
+    @Unique
+    private static boolean buttonAdded = false;
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        if (!ConfigManager.getConfig().showCancelButton) return;
+        buttonAdded = false;
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void onRender(CallbackInfo ci) {
+        if (buttonAdded || !ConfigManager.getConfig().showCancelButton) return;
 
         ConnectScreen self = (ConnectScreen) (Object) this;
 
-        ButtonWidget btn = ButtonWidget.builder(
+        autoJoinButton = ButtonWidget.builder(
             Text.literal("§cAnuluj"),
             b -> {
                 net.minecraft.network.ClientConnection conn = ((ConnectScreenAccessor) self).getConnection();
@@ -34,6 +44,7 @@ public class ConnectScreenMixin {
         .dimensions(self.width / 2 - 60, self.height / 2 + 40, 120, 20)
         .build();
 
-        ((ScreenAccessor) self).invokeAddDrawableChild(btn);
+        ((ScreenAccessor) self).invokeAddDrawableChild(autoJoinButton);
+        buttonAdded = true;
     }
 }
