@@ -2,6 +2,7 @@ package com.zwierz.autojoin.mixin;
 
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -12,4 +13,7 @@ public interface ConnectScreenAccessor {
 
     @Accessor("connection")
     ClientConnection getConnection();
+
+    @Accessor("failureErrorMessage")
+    Text getFailureErrorMessage();
 }

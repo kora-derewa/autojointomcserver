@@ -2,6 +2,8 @@ package com.zwierz.autojoin.client;
 
 import com.zwierz.autojoin.AutoJoinMod;
 import com.zwierz.autojoin.ConfigManager;
+import com.zwierz.autojoin.mixin.ConnectScreenAccessor;
+import com.zwierz.autojoin.mixin.ScreenAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
@@ -9,6 +11,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -22,6 +26,7 @@ public class AutoJoinClient implements ClientModInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoJoinMod.MOD_ID);
     private static boolean musicMuted = false;
     private static boolean startupMusicPlayed = false;
+    private static boolean connectScreenButtonAdded = false;
 
     @Override
     public void onInitializeClient() {
@@ -52,6 +57,25 @@ public class AutoJoinClient implements ClientModInitializer {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (screen instanceof TitleScreen) {
                 startupMusicPlayed = false;
+                return;
+            }
+            if (screen instanceof ConnectScreen && ConfigManager.getConfig().showCancelButton) {
+                LOGGER.info("AutoJoin: dodaję przycisk na ConnectScreen");
+                ConnectScreen cs = (ConnectScreen) screen;
+                ButtonWidget btn = ButtonWidget.builder(
+                    Text.literal("§cAnuluj"),
+                    b -> {
+                        AutoJoinMod.cancelled = true;
+                        ((ConnectScreenAccessor) cs).setConnectingCancelled(true);
+                        if (((ConnectScreenAccessor) cs).getConnection() != null) {
+                            ((ConnectScreenAccessor) cs).getConnection().disconnect(Text.literal("Anulowano"));
+                        }
+                        cs.close();
+                    }
+                )
+                .dimensions(screen.width / 2 - 60, screen.height / 2 + 30, 120, 20)
+                .build();
+                ((ScreenAccessor) screen).invokeAddDrawableChild(btn);
             }
         });
     }
