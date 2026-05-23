@@ -6,5 +6,6 @@
   "autoJoinOnLaunch": true,
   "showMessages": true,
   "muteMusic": true,
-  "startupMusic": ""
+  "startupMusic": "",
+  "showCancelButton": true
 }

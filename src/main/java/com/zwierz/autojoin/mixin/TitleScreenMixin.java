@@ -16,13 +16,13 @@ public class TitleScreenMixin {
     @Inject(method = "init", at = @At("TAIL"))
     private void onScreenOpen(CallbackInfo ci) {
         ConfigManager.Config config = ConfigManager.getConfig();
-        if (!config.enabled || !config.autoJoinOnLaunch) return;
+        if (!config.enabled || !config.autoJoinOnLaunch || !config.showCancelButton) return;
 
         TitleScreen self = (TitleScreen) (Object) this;
 
-        int btnX = self.width / 2;
-        int btnY = self.height / 4 + 96;
-        int btnW = 98;
+        int btnX = self.width / 2 - 100;
+        int btnY = self.height / 4 + 144;
+        int btnW = 200;
 
         ButtonWidget btn;
         if (AutoJoinMod.cancelled) {
@@ -30,14 +30,14 @@ public class TitleScreenMixin {
                 .dimensions(btnX, btnY, btnW, 20).build();
             btn.active = false;
         } else if (AutoJoinMod.hasJoined) {
-            btn = ButtonWidget.builder(Text.literal("§ePonownie"), b -> {
+            btn = ButtonWidget.builder(Text.literal("§eSpróbuj ponownie"), b -> {
                     AutoJoinMod.hasJoined = false;
                     AutoJoinMod.cancelled = false;
                     AutoJoinMod.joinAttemptTime = 0;
                 })
                 .dimensions(btnX, btnY, btnW, 20).build();
         } else {
-            btn = ButtonWidget.builder(Text.literal("§cAnuluj"), b -> {
+            btn = ButtonWidget.builder(Text.literal("§cAnuluj auto-join"), b -> {
                     AutoJoinMod.cancelled = true;
                     if (config.showMessages) {
                         net.minecraft.client.MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(

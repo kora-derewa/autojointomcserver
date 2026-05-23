@@ -158,7 +158,8 @@ Plik konfiguracji tworzy się automatycznie przy pierwszym uruchomieniu:
   "autoJoinOnLaunch": true,
   "showMessages": true,
   "muteMusic": true,
-  "startupMusic": ""
+  "startupMusic": "",
+  "showCancelButton": true
 }
 ```
 
@@ -172,6 +173,7 @@ Plik konfiguracji tworzy się automatycznie przy pierwszym uruchomieniu:
 | `showMessages` | boolean | `true` | Komunikaty w chacie |
 | `muteMusic` | boolean | `true` | Wycisza całą muzykę w tle |
 | `startupMusic` | string | `""` | Sound event odtwarzany na ekranie tytułu (np. `minecraft:music_disc.13`, `minecraft:entity.experience_orb.pickup`). Puste = brak muzyki startowej |
+| `showCancelButton` | boolean | `true` | Pokazuj przycisk anulowania auto-join na ekranie tytułu |
 
 ### Przykłady
 

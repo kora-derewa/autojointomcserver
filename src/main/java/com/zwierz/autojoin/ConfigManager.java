@@ -65,6 +65,7 @@ public class ConfigManager {
         config.showMessages = true;
         config.muteMusic = true;
         config.startupMusic = "";
+        config.showCancelButton = true;
 
         try {
             Files.createDirectories(CONFIG_DIR);
@@ -114,6 +115,7 @@ public class ConfigManager {
         public boolean showMessages = true;
         public boolean muteMusic = true;
         public String startupMusic = "";
+        public boolean showCancelButton = true;
 
         public String getServerAddress() {
             return serverAddress + ":" + serverPort;
