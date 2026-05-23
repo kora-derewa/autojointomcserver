@@ -23,25 +23,64 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
 
-        cancelButton = ButtonWidget.builder(
-            Text.literal("§c✕ Anuluj auto-join"),
-            btn -> {
-                AutoJoinMod.cancelled = true;
-                btn.active = false;
-                btn.setMessage(Text.literal("§7Anulowano"));
-                if (config.showMessages) {
-                    net.minecraft.client.MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
-                        Text.literal("§6[AutoJoin] §cAuto-dołączanie anulowane")
-                    );
-                }
-                AutoJoinMod.LOGGER.info("AutoJoin anulowane przez gracza");
-            }
-        )
-        .dimensions(self.width / 2 + 110, self.height / 4 + 110, 110, 20)
-        .build();
-        cancelButton.active = !AutoJoinMod.hasJoined && !AutoJoinMod.cancelled;
-        cancelButton.visible = true;
+        updateButtonState();
 
+        if (cancelButton == null) {
+            cancelButton = ButtonWidget.builder(
+                Text.literal(""),
+                btn -> onCancelClick(config)
+            )
+            .dimensions(self.width / 2 + 110, self.height / 4 + 110, 110, 20)
+            .build();
+        }
+
+        updateButtonState();
         ((ScreenAccessor) self).invokeAddDrawableChild(cancelButton);
+    }
+
+    @Unique
+    private static void updateButtonState() {
+        if (cancelButton == null) return;
+
+        if (AutoJoinMod.cancelled) {
+            cancelButton.setMessage(Text.literal("§7Anulowano"));
+            cancelButton.active = false;
+        } else if (AutoJoinMod.hasJoined) {
+            cancelButton.setMessage(Text.literal("§e↻ Spróbuj ponownie"));
+            cancelButton.active = true;
+        } else {
+            cancelButton.setMessage(Text.literal("§c✕ Anuluj auto-join"));
+            cancelButton.active = true;
+        }
+    }
+
+    @Unique
+    private static void onCancelClick(ConfigManager.Config config) {
+        if (AutoJoinMod.cancelled) {
+            return;
+        }
+
+        if (AutoJoinMod.hasJoined) {
+            AutoJoinMod.hasJoined = false;
+            AutoJoinMod.cancelled = false;
+            AutoJoinMod.joinAttemptTime = 0;
+            updateButtonState();
+            if (config.showMessages) {
+                net.minecraft.client.MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
+                    Text.literal("§6[AutoJoin] §eAuto-join wznowiony")
+                );
+            }
+            AutoJoinMod.LOGGER.info("AutoJoin: reset, mozna sprobowac ponownie");
+            return;
+        }
+
+        AutoJoinMod.cancelled = true;
+        updateButtonState();
+        if (config.showMessages) {
+            net.minecraft.client.MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
+                Text.literal("§6[AutoJoin] §cAuto-dołączanie anulowane")
+            );
+        }
+        AutoJoinMod.LOGGER.info("AutoJoin anulowane przez gracza");
     }
 }

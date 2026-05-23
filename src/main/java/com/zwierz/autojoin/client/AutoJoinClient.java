@@ -50,10 +50,9 @@ public class AutoJoinClient implements ClientModInitializer {
         });
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (!(screen instanceof TitleScreen)) {
-                AutoJoinMod.joinAttemptTime = 0;
+            if (screen instanceof TitleScreen) {
+                startupMusicPlayed = false;
             }
-            startupMusicPlayed = false;
         });
     }
 
