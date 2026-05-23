@@ -4,7 +4,8 @@
   "package": "com.zwierz.autojoin.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ScreenAccessor"
+    "ScreenAccessor",
+    "DisconnectedScreenMixin"
   ],
   "client": [],
   "injectors": {
