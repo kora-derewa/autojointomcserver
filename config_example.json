@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "serverAddress": "mc.example.com",
+  "serverPort": 25565,
+  "delayMs": 1000,
+  "autoJoinOnLaunch": true,
+  "showMessages": true
+}
