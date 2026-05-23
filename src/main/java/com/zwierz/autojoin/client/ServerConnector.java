@@ -2,8 +2,11 @@ package com.zwierz.autojoin.client;
 
 import com.zwierz.autojoin.AutoJoinMod;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ConnectScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +18,11 @@ public class ServerConnector {
             LOGGER.info("Łączenie z serwerem: {}:{}", address, port);
 
             ServerAddress serverAddress = ServerAddress.parse(address + ":" + port);
+            ServerInfo serverInfo = new ServerInfo(address, address + ":" + port, ServerInfo.ServerType.OTHER);
 
-            ConnectScreen.connect(
-                new ConnectScreen(null, client, serverAddress.getAddress(), serverAddress.getPort()),
-                client,
-                serverAddress.getAddress(),
-                serverAddress.getPort(),
-                false
-            );
+            Screen parent = client.currentScreen != null ? client.currentScreen : new TitleScreen();
+
+            ConnectScreen.connect(parent, client, serverAddress, serverInfo, false);
 
             LOGGER.info("Wysłano żądanie połączenia do serwera");
         } catch (Exception e) {
