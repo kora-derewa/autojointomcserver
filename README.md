@@ -56,8 +56,28 @@ Po uruchomieniu Minecrafta edytuj `~/.minecraft/config/autojoin/autojoin.json` i
 | Komponent | Minimalna wersja |
 |-----------|-----------------|
 | Java | 17+ (zalecane 21) |
-| Minecraft | 1.20.4 |
+| Minecraft | 1.18.2+ |
 | Fabric Loader | 0.14.25+ |
+
+## Obsługiwane wersje Minecraft
+
+| Wersja | JAR | Status |
+|--------|-----|--------|
+| 1.18.2 | `autojoin-1.18.2-1.1.0.jar` | ✅ |
+| 1.19.4 | `autojoin-1.19.4-1.1.0.jar` | ✅ |
+| 1.20.4 | `autojoin-1.20.4-1.1.0.jar` | ✅ |
+| 1.21.4 | `autojoin-1.21.4-1.1.0.jar` | ✅ |
+| 26.1 | — | ⏳ (brak Yarn/mapowań) |
+
+## Budowanie
+
+```bash
+# Wybrana wersja
+./gradlew build -PmcVersion=1.20.4
+
+# Wszystkie wersje
+./build-all.sh
+```
 
 ### Instalacja Javy
 

@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version '1.17.0-alpha.12'
 	id 'maven-publish'
 }
 
@@ -10,7 +10,7 @@ def versionConfigs = [
 	"1.19.4": [minecraft: "1.19.4",        yarn: "1.19.4+build.2:v2",   fabric: "0.75.3+1.19.4",   loader: "0.14.25", java: 17],
 	"1.20.4": [minecraft: "1.20.4",        yarn: "1.20.4+build.3:v2",   fabric: "0.97.0+1.20.4",   loader: "0.14.25", java: 17],
 	"1.21.4": [minecraft: "1.21.4",        yarn: "1.21.4+build.1:v2",   fabric: "0.111.0+1.21.4",  loader: "0.16.0",  java: 21],
-	"26.1":   [minecraft: "26.1",          yarn: "26.1+build.1:v2",     fabric: "0.140.0+26.1",    loader: "0.16.0",  java: 21],
+	"26.1":   [minecraft: "26.1",          yarn: "",                     fabric: "0.140.0+26.1",    loader: "0.16.0",  java: 25], // wymaga Java 25 + Loom z ASM 9.8+
 ]
 
 def cfg = versionConfigs[mcVersion]
@@ -20,7 +20,7 @@ java.sourceCompatibility = JavaVersion.toVersion(cfg.java)
 java.targetCompatibility = JavaVersion.toVersion(cfg.java)
 
 group = project.maven_group
-archivesBaseName = "${project.archives_base_name}-${mcVersion}"
+base.archivesName = "${project.archives_base_name}-${mcVersion}"
 version = project.mod_version
 
 def assembledSrc = file("$buildDir/generated/autojoin/${mcVersion}/java")
@@ -74,7 +74,11 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${cfg.minecraft}"
-	mappings "net.fabricmc:yarn:${cfg.yarn}"
+	if (cfg.yarn && !cfg.yarn.isEmpty()) {
+		mappings "net.fabricmc:yarn:${cfg.yarn}"
+	} else {
+		mappings loom.officialMojangMappings()
+	}
 	modImplementation "net.fabricmc:fabric-loader:${cfg.loader}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${cfg.fabric}"
 }
@@ -97,6 +101,6 @@ tasks.withType(JavaCompile).configureEach {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}" }
+		rename { "${it}_${base.archivesName}" }
 	}
 }
