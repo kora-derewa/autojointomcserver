@@ -20,33 +20,23 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
 
-        int btnX = self.width / 2 - 100;
-        int btnY = self.height / 4 + 144;
-        int btnW = 200;
+        if (!AutoJoinMod.hasJoined) return;
 
-        ButtonWidget btn;
-        if (AutoJoinMod.cancelled) {
-            btn = ButtonWidget.builder(Text.literal("§7Anulowano"), b -> {})
-                .dimensions(btnX, btnY, btnW, 20).build();
-            btn.active = false;
-        } else if (AutoJoinMod.hasJoined) {
-            btn = ButtonWidget.builder(Text.literal("§eSpróbuj ponownie"), b -> {
+        ButtonWidget btn = ButtonWidget.builder(
+            AutoJoinMod.cancelled
+                ? Text.literal("§7Anulowano")
+                : Text.literal("§eSpróbuj ponownie"),
+            b -> {
+                if (!AutoJoinMod.cancelled) {
                     AutoJoinMod.hasJoined = false;
                     AutoJoinMod.cancelled = false;
                     AutoJoinMod.joinAttemptTime = 0;
-                })
-                .dimensions(btnX, btnY, btnW, 20).build();
-        } else {
-            btn = ButtonWidget.builder(Text.literal("§cAnuluj auto-join"), b -> {
-                    AutoJoinMod.cancelled = true;
-                    if (config.showMessages) {
-                        net.minecraft.client.MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
-                            Text.literal("§6[AutoJoin] §cAuto-dołączanie anulowane")
-                        );
-                    }
-                })
-                .dimensions(btnX, btnY, btnW, 20).build();
-        }
+                }
+            }
+        )
+        .dimensions(self.width / 2 - 100, self.height / 4 + 144, 200, 20)
+        .build();
+        if (AutoJoinMod.cancelled) btn.active = false;
 
         ((ScreenAccessor) self).invokeAddDrawableChild(btn);
     }
