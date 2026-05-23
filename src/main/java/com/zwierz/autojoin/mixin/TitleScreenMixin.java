@@ -20,40 +20,32 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
 
+        int btnX = self.width / 2;
+        int btnY = self.height / 4 + 96;
+        int btnW = 98;
+
         ButtonWidget btn;
         if (AutoJoinMod.cancelled) {
-            btn = ButtonWidget.builder(
-                Text.literal("§7Anulowano"),
-                b -> {}
-            )
-            .dimensions(self.width / 2 + 104, self.height / 4 + 96, 100, 20)
-            .build();
+            btn = ButtonWidget.builder(Text.literal("§7Anulowano"), b -> {})
+                .dimensions(btnX, btnY, btnW, 20).build();
             btn.active = false;
         } else if (AutoJoinMod.hasJoined) {
-            btn = ButtonWidget.builder(
-                Text.literal("§eSpróbuj ponownie"),
-                b -> {
+            btn = ButtonWidget.builder(Text.literal("§ePonownie"), b -> {
                     AutoJoinMod.hasJoined = false;
                     AutoJoinMod.cancelled = false;
                     AutoJoinMod.joinAttemptTime = 0;
-                }
-            )
-            .dimensions(self.width / 2 + 104, self.height / 4 + 96, 100, 20)
-            .build();
+                })
+                .dimensions(btnX, btnY, btnW, 20).build();
         } else {
-            btn = ButtonWidget.builder(
-                Text.literal("§cAnuluj"),
-                b -> {
+            btn = ButtonWidget.builder(Text.literal("§cAnuluj"), b -> {
                     AutoJoinMod.cancelled = true;
                     if (config.showMessages) {
                         net.minecraft.client.MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
                             Text.literal("§6[AutoJoin] §cAuto-dołączanie anulowane")
                         );
                     }
-                }
-            )
-            .dimensions(self.width / 2 + 104, self.height / 4 + 96, 100, 20)
-            .build();
+                })
+                .dimensions(btnX, btnY, btnW, 20).build();
         }
 
         ((ScreenAccessor) self).invokeAddDrawableChild(btn);
