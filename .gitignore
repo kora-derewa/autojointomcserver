@@ -1,0 +1,38 @@
+.gradle
+build/
+.idea/
+*.iml
+out/
+*.jar
+*.zip
+*.tar.gz
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradle
+
+# IDE
+.idea/
+*.ipr
+*.iws
+*.iml
+.classpath
+.project
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Run client
+run/

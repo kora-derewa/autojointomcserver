@@ -1,0 +1,6 @@
+{
+  "text.autojoin.joining": "Dołączanie na serwer...",
+  "text.autojoin.joined": "Pomyślnie dołączono do serwera",
+  "text.autojoin.failed": "Błąd przy dołączaniu do serwera",
+  "text.autojoin.config_loaded": "Konfiguracja AutoJoin załadowana"
+}
