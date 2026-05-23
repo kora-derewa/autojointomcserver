@@ -26,7 +26,7 @@ public class AutoJoinClient implements ClientModInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoJoinMod.MOD_ID);
     private static boolean musicMuted = false;
     private static boolean startupMusicPlayed = false;
-    private static boolean connectScreenButtonAdded = false;
+    private static ButtonWidget connectScreenBtn;
 
     @Override
     public void onInitializeClient() {
@@ -52,6 +52,13 @@ public class AutoJoinClient implements ClientModInitializer {
                     AutoJoinMod.hasJoined = true;
                 }
             }
+
+            if (client.currentScreen instanceof ConnectScreen && connectScreenBtn != null) {
+                boolean done = ((ConnectScreenAccessor) client.currentScreen).getConnection() == null;
+                connectScreenBtn.setMessage(done
+                    ? Text.literal("§eSpróbuj ponownie")
+                    : Text.literal("§cAnuluj"));
+            }
         });
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
@@ -62,20 +69,24 @@ public class AutoJoinClient implements ClientModInitializer {
             if (screen instanceof ConnectScreen && ConfigManager.getConfig().showCancelButton) {
                 LOGGER.info("AutoJoin: dodaję przycisk na ConnectScreen");
                 ConnectScreen cs = (ConnectScreen) screen;
-                ButtonWidget btn = ButtonWidget.builder(
+                connectScreenBtn = ButtonWidget.builder(
                     Text.literal("§cAnuluj"),
                     b -> {
-                        AutoJoinMod.cancelled = true;
-                        ((ConnectScreenAccessor) cs).setConnectingCancelled(true);
                         if (((ConnectScreenAccessor) cs).getConnection() != null) {
+                            ((ConnectScreenAccessor) cs).setConnectingCancelled(true);
                             ((ConnectScreenAccessor) cs).getConnection().disconnect(Text.literal("Anulowano"));
+                            cs.close();
+                        } else {
+                            AutoJoinMod.hasJoined = false;
+                            AutoJoinMod.cancelled = false;
+                            AutoJoinMod.joinAttemptTime = 0;
+                            cs.close();
                         }
-                        cs.close();
                     }
                 )
                 .dimensions(screen.width / 2 - 60, screen.height / 2 + 30, 120, 20)
                 .build();
-                ((ScreenAccessor) screen).invokeAddDrawableChild(btn);
+                ((ScreenAccessor) screen).invokeAddDrawableChild(connectScreenBtn);
             }
         });
     }
