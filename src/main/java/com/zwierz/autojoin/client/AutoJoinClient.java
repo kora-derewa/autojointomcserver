@@ -63,23 +63,7 @@ public class AutoJoinClient implements ClientModInitializer {
                 );
             }
 
-            // Utwórz komendę dołączenia do serwera
-            String command = "/connect " + config.serverAddress + " " + config.serverPort;
-
-            // Alternatywna metoda - bezpośrednie dołączenie
-            client.disconnect();
-            client.getNetworkHandler().getConnection().disconnect(Text.literal("Dołączanie do serwera..."));
-
-            // Dołącz do serwera
-            client.setScreen(null);
-            new Thread(() -> {
-                try {
-                    Thread.sleep(500);
-                    ServerConnector.connectToServer(client, config.serverAddress, config.serverPort);
-                } catch (Exception e) {
-                    LOGGER.error("Błąd przy dołączaniu do serwera", e);
-                }
-            }).start();
+            ServerConnector.connectToServer(client, config.serverAddress, config.serverPort);
 
         } catch (Exception e) {
             LOGGER.error("Błąd przy próbie dołączenia", e);
