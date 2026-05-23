@@ -31,7 +31,7 @@ public class DisconnectedScreenMixin {
                 MinecraftClient.getInstance().setScreen(new TitleScreen());
             }
         )
-        .dimensions(self.width / 2 + 5, self.height / 2 + 80, 150, 20)
+        .dimensions(self.width / 2 - 100, self.height / 4 + 180, 200, 20)
         .build();
         ((ScreenAccessor) self).invokeAddDrawableChild(retryBtn);
     }
