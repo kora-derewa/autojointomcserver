@@ -11,6 +11,8 @@ public class AutoJoinMod implements ModInitializer {
     public static boolean hasJoined = false;
     public static boolean cancelled = false;
     public static long joinAttemptTime = 0;
+    public static boolean commandsSent = false;
+    public static long commandTimer = 0;
 
     @Override
     public void onInitialize() {

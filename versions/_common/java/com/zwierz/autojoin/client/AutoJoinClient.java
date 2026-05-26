@@ -46,6 +46,19 @@ public class AutoJoinClient implements ClientModInitializer {
                     AutoJoinMod.hasJoined = true;
                 }
             }
+
+            if (config.autoCommandEnabled
+                    && AutoJoinMod.hasJoined && !AutoJoinMod.commandsSent
+                    && client.player != null && client.getServer() == null
+                    && client.currentScreen == null) {
+                if (AutoJoinMod.commandTimer == 0) {
+                    AutoJoinMod.commandTimer = System.currentTimeMillis();
+                }
+                if (System.currentTimeMillis() - AutoJoinMod.commandTimer >= config.commandDelayMs) {
+                    sendQueuedCommands(client, config);
+                    AutoJoinMod.commandsSent = true;
+                }
+            }
         });
 
     }
@@ -82,6 +95,19 @@ public class AutoJoinClient implements ClientModInitializer {
             client.options.getSoundVolumeOption(SoundCategory.MUSIC).setValue(1.0);
             musicMuted = false;
             LOGGER.info("Muzyka przywrócona");
+        }
+    }
+
+    private static void sendQueuedCommands(MinecraftClient client, ConfigManager.Config config) {
+        if (config.autoCommands == null || config.autoCommands.length == 0) return;
+        for (String cmd : config.autoCommands) {
+            if (cmd == null || cmd.trim().isEmpty()) continue;
+            ServerConnector.sendCommand(client, cmd.trim());
+            if (config.showMessages) {
+                client.inGameHud.getChatHud().addMessage(
+                    Text.literal("§6[AutoJoin] §aWykonuję komendę: /" + cmd.trim())
+                );
+            }
         }
     }
 

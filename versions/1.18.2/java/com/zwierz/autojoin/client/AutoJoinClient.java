@@ -35,7 +35,33 @@ public class AutoJoinClient implements ClientModInitializer {
                     AutoJoinMod.hasJoined = true;
                 }
             }
+
+            if (config.autoCommandEnabled
+                    && AutoJoinMod.hasJoined && !AutoJoinMod.commandsSent
+                    && client.player != null && client.getServer() == null
+                    && client.currentScreen == null) {
+                if (AutoJoinMod.commandTimer == 0) {
+                    AutoJoinMod.commandTimer = System.currentTimeMillis();
+                }
+                if (System.currentTimeMillis() - AutoJoinMod.commandTimer >= config.commandDelayMs) {
+                    sendQueuedCommands(client, config);
+                    AutoJoinMod.commandsSent = true;
+                }
+            }
         });
+    }
+
+    private static void sendQueuedCommands(MinecraftClient client, ConfigManager.Config config) {
+        if (config.autoCommands == null || config.autoCommands.length == 0) return;
+        for (String cmd : config.autoCommands) {
+            if (cmd == null || cmd.trim().isEmpty()) continue;
+            ServerConnector.sendCommand(client, cmd.trim());
+            if (config.showMessages) {
+                client.inGameHud.getChatHud().addMessage(
+                    new LiteralText("§6[AutoJoin] §aWykonuję komendę: /" + cmd.trim())
+                );
+            }
+        }
     }
 
     private static void joinServer(MinecraftClient client, ConfigManager.Config config) {

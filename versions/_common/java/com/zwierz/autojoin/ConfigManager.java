@@ -66,6 +66,9 @@ public class ConfigManager {
         config.muteMusic = true;
         config.startupMusic = "";
         config.showCancelButton = true;
+        config.autoCommandEnabled = false;
+        config.autoCommands = new String[]{};
+        config.commandDelayMs = 2000;
 
         try {
             Files.createDirectories(CONFIG_DIR);
@@ -116,6 +119,9 @@ public class ConfigManager {
         public boolean muteMusic = true;
         public String startupMusic = "";
         public boolean showCancelButton = true;
+        public boolean autoCommandEnabled = false;
+        public String[] autoCommands = new String[]{};
+        public int commandDelayMs = 2000;
 
         public String getServerAddress() {
             return serverAddress + ":" + serverPort;

@@ -24,4 +24,10 @@ public class ServerConnector {
             LOGGER.error("Błąd przy łączeniu z serwerem", e);
         }
     }
+
+    public static void sendCommand(MinecraftClient client, String command) {
+        if (client.player != null && client.player.networkHandler != null) {
+            client.player.networkHandler.sendChatCommand(command);
+        }
+    }
 }

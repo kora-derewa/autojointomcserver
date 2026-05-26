@@ -28,6 +28,8 @@ public class DisconnectedScreenMixin {
                 AutoJoinMod.hasJoined = false;
                 AutoJoinMod.cancelled = false;
                 AutoJoinMod.joinAttemptTime = 0;
+                AutoJoinMod.commandsSent = false;
+                AutoJoinMod.commandTimer = 0;
                 MinecraftClient.getInstance().setScreen(new TitleScreen());
             }
         )
