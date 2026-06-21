@@ -1,14 +1,71 @@
 plugins {
-	id 'fabric-loom' version '1.4.+'
+	id 'fabric-loom' version '1.17.0-alpha.12'
 	id 'maven-publish'
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+def mcVersion = project.findProperty("mcVersion") ?: "1.20.4"
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
+def versionConfigs = [
+	"1.18.2": [minecraft: "1.18.2",        yarn: "1.18.2+build.3:v2",   fabric: "0.58.0+1.18.2",   loader: "0.14.25", java: 17],
+	"1.19.4": [minecraft: "1.19.4",        yarn: "1.19.4+build.2:v2",   fabric: "0.75.3+1.19.4",   loader: "0.14.25", java: 17],
+	"1.20.4": [minecraft: "1.20.4",        yarn: "1.20.4+build.3:v2",   fabric: "0.97.0+1.20.4",   loader: "0.14.25", java: 17],
+	"1.21.4": [minecraft: "1.21.4",        yarn: "1.21.4+build.1:v2",   fabric: "0.111.0+1.21.4",  loader: "0.16.0",  java: 21],
+	"26.1":   [minecraft: "26.1",          yarn: "",                     fabric: "0.140.0+26.1",    loader: "0.16.0",  java: 25], // wymaga Java 25 + Loom z ASM 9.8+
+]
+
+def cfg = versionConfigs[mcVersion]
+if (cfg == null) throw new GradleException("Unsupported mcVersion: $mcVersion. Supported: ${versionConfigs.keySet()}")
+
+java.sourceCompatibility = JavaVersion.toVersion(cfg.java)
+java.targetCompatibility = JavaVersion.toVersion(cfg.java)
+
 group = project.maven_group
+base.archivesName = "${project.archives_base_name}-${mcVersion}"
+version = project.mod_version
+
+def assembledSrc = file("$buildDir/generated/autojoin/${mcVersion}/java")
+def assembledRes = file("$buildDir/generated/autojoin/${mcVersion}/resources")
+
+task assembleSources(type: Copy) {
+	from("versions/_common/java")
+	into(assembledSrc)
+}
+
+task overrideSources(type: Copy) {
+	dependsOn assembleSources
+	from("versions/${mcVersion}/java")
+	into(assembledSrc)
+}
+
+task assembleResources(type: Copy) {
+	from("versions/_common/resources")
+	into(assembledRes)
+}
+
+task overrideResources(type: Copy) {
+	dependsOn assembleResources
+	from("versions/${mcVersion}/resources")
+	into(assembledRes)
+	duplicatesStrategy = "INCLUDE"
+}
+
+task prepareSources {
+	dependsOn overrideSources, overrideResources
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir(assembledSrc)
+		}
+		resources {
+			srcDir(assembledRes)
+		}
+	}
+}
+
+compileJava.dependsOn(prepareSources)
+processResources.dependsOn(prepareSources)
 
 repositories {
 	maven { url = 'https://api.modrinth.com/maven' }
@@ -16,46 +73,34 @@ repositories {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	minecraft "com.mojang:minecraft:${cfg.minecraft}"
+	if (cfg.yarn && !cfg.yarn.isEmpty()) {
+		mappings "net.fabricmc:yarn:${cfg.yarn}"
+	} else {
+		mappings loom.officialMojangMappings()
+	}
+	modImplementation "net.fabricmc:fabric-loader:${cfg.loader}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${cfg.fabric}"
 }
 
 processResources {
 	inputs.property "version", project.version
-	inputs.property "minecraft_version", project.minecraft_version
-	inputs.property "loader_version", project.loader_version
+	inputs.property "minecraft_version", cfg.minecraft
+	inputs.property "loader_version", cfg.loader
 
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version,
-				"minecraft_version": project.minecraft_version,
-				"loader_version": project.loader_version
+				"minecraft_version": cfg.minecraft,
+				"loader_version": cfg.loader
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+	it.options.release = cfg.java
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}" }
-	}
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			publication.artifact(remapJar) {
-				builtBy remapJar
-			}
-			publication.artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
-
-	repositories {
+		rename { "${it}_${base.archivesName}" }
 	}
 }

@@ -4,5 +4,8 @@
   "serverPort": 25565,
   "delayMs": 1000,
   "autoJoinOnLaunch": true,
-  "showMessages": true
+  "showMessages": true,
+  "muteMusic": true,
+  "startupMusic": "",
+  "showCancelButton": true
 }
